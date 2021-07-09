@@ -1,0 +1,21 @@
+name: flutter_audio_service_demo
+description: Companion project for tutorial on audio_service plugin.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  audio_video_progress_bar: ^0.5.0
+  get_it: ^7.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
