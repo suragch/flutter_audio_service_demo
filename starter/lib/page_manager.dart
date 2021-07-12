@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'notifiers/play_button_notifier.dart';
 import 'notifiers/progress_notifier.dart';
 import 'notifiers/repeat_button_notifier.dart';
+import 'services/playlist_repository.dart';
 
 class PageManager {
   // Listeners: Updates going to the UI
