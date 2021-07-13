@@ -84,7 +84,6 @@ class PageManager {
   void _listenToBufferedPosition() {
     _audioHandler.playbackState.listen((playbackState) {
       final oldState = progressNotifier.value;
-      print(playbackState.bufferedPosition);
       progressNotifier.value = ProgressBarState(
         current: oldState.current,
         buffered: playbackState.bufferedPosition,

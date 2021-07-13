@@ -85,6 +85,8 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler {
   void _listenForSequenceStateChanges() {
     _player.sequenceStateStream.listen((SequenceState? sequenceState) {
       final sequence = sequenceState?.effectiveSequence;
+      final indices = sequenceState?.shuffleIndices;
+      print('effective sequence: $sequence, indices: $indices');
       if (sequence == null || sequence.isEmpty) return;
       print('This line is never reached.');
       final items = sequence.map((source) => source.tag as MediaItem);
