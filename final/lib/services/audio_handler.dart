@@ -23,6 +23,7 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler {
   Future<void> _init() async {
     _notifyAudioHandlerAboutPlaybackEvents();
     _listenForDurationChanges();
+    _listenForSequenceStateChanges();
     try {
       await _player.setAudioSource(_playlist);
     } catch (e) {
@@ -51,6 +52,14 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler {
           ProcessingState.ready: AudioProcessingState.ready,
           ProcessingState.completed: AudioProcessingState.completed,
         }[_player.processingState]!,
+        repeatMode: const {
+          LoopMode.off: AudioServiceRepeatMode.none,
+          LoopMode.one: AudioServiceRepeatMode.one,
+          LoopMode.all: AudioServiceRepeatMode.all,
+        }[_player.loopMode]!,
+        shuffleMode: (_player.shuffleModeEnabled)
+            ? AudioServiceShuffleMode.all
+            : AudioServiceShuffleMode.none,
         playing: playing,
         updatePosition: _player.position,
         bufferedPosition: _player.bufferedPosition,
@@ -70,6 +79,16 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler {
       newQueue[index] = newMediaItem;
       queue.add(newQueue);
       mediaItem.add(newMediaItem);
+    });
+  }
+
+  void _listenForSequenceStateChanges() {
+    _player.sequenceStateStream.listen((SequenceState? sequenceState) {
+      final sequence = sequenceState?.effectiveSequence;
+      if (sequence == null || sequence.isEmpty) return;
+      print('This line is never reached.');
+      final items = sequence.map((source) => source.tag as MediaItem);
+      queue.add(items.toList());
     });
   }
 
@@ -99,4 +118,53 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler {
 
   @override
   Future<void> seek(Duration position) => _player.seek(position);
+
+  @override
+  Future<void> skipToQueueItem(int index) async {
+    if (index < 0 || index >= queue.value.length) return;
+    _player.seek(Duration.zero, index: index);
+  }
+
+  @override
+  Future<void> skipToNext() async {
+    await _skip(1);
+  }
+
+  @override
+  Future<void> skipToPrevious() async {
+    await _skip(-1);
+  }
+
+  Future<void> _skip(int offset) async {
+    final queue = this.queue.value;
+    final index = playbackState.value.queueIndex ?? -1;
+    if (index < 0 || index >= queue.length) return;
+    return skipToQueueItem(index + offset);
+  }
+
+  @override
+  Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {
+    switch (repeatMode) {
+      case AudioServiceRepeatMode.none:
+        _player.setLoopMode(LoopMode.off);
+        break;
+      case AudioServiceRepeatMode.one:
+        _player.setLoopMode(LoopMode.one);
+        break;
+      case AudioServiceRepeatMode.group:
+      case AudioServiceRepeatMode.all:
+        _player.setLoopMode(LoopMode.all);
+        break;
+    }
+  }
+
+  @override
+  Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) async {
+    if (shuffleMode == AudioServiceShuffleMode.none) {
+      _player.setShuffleModeEnabled(false);
+    } else {
+      _player.setShuffleModeEnabled(true);
+      _player.shuffle();
+    }
+  }
 }

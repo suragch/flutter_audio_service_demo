@@ -11,12 +11,10 @@ packages:
   audio_service:
     dependency: "direct main"
     description:
-      path: audio_service
-      ref: one-isolate
-      resolved-ref: "4996134a37d125ebeb958fa390571584e3aaf56d"
-      url: "https://github.com/ryanheise/audio_service.git"
-    source: git
-    version: "0.16.2"
+      name: audio_service
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.18.0-beta.0"
   audio_service_platform_interface:
     dependency: transitive
     description:

@@ -27,6 +27,7 @@ class PageManager {
     _listenToCurrentPosition();
     _listenToBufferedPosition();
     _listenToTotalDuration();
+    _listenToChangesInSong();
   }
 
   Future<void> _loadPlaylist() async {
@@ -94,7 +95,6 @@ class PageManager {
 
   void _listenToTotalDuration() {
     _audioHandler.mediaItem.listen((mediaItem) {
-      print('media item stream event: $mediaItem');
       final oldState = progressNotifier.value;
       progressNotifier.value = ProgressBarState(
         current: oldState.current,
@@ -104,15 +104,50 @@ class PageManager {
     });
   }
 
+  void _listenToChangesInSong() {
+    _audioHandler.mediaItem.listen((mediaItem) {
+      final playlist = _audioHandler.queue.value;
+      isFirstSongNotifier.value = playlist.first == mediaItem;
+      isLastSongNotifier.value = playlist.last == mediaItem;
+      currentSongTitleNotifier.value = mediaItem?.title ?? '';
+    });
+  }
+
   void play() => _audioHandler.play();
   void pause() => _audioHandler.pause();
 
   void seek(Duration position) => _audioHandler.seek(position);
 
-  void previous() {}
-  void next() {}
-  void repeat() {}
-  void shuffle() {}
+  void previous() => _audioHandler.skipToPrevious();
+  void next() => _audioHandler.skipToNext();
+
+  void repeat() {
+    repeatButtonNotifier.nextState();
+    final repeatMode = repeatButtonNotifier.value;
+    switch (repeatMode) {
+      case RepeatState.off:
+        _audioHandler.setRepeatMode(AudioServiceRepeatMode.none);
+        break;
+      case RepeatState.repeatSong:
+        _audioHandler.setRepeatMode(AudioServiceRepeatMode.one);
+        break;
+      case RepeatState.repeatPlaylist:
+        _audioHandler.setRepeatMode(AudioServiceRepeatMode.all);
+        break;
+    }
+  }
+
+  void shuffle() {
+    final enable = !isShuffleModeEnabledNotifier.value;
+    isShuffleModeEnabledNotifier.value = enable;
+    if (enable) {
+      _audioHandler.setShuffleMode(AudioServiceShuffleMode.all);
+    } else {
+      _audioHandler.setShuffleMode(AudioServiceShuffleMode.none);
+    }
+  }
+
+  // TODO
   void add() {}
   void remove() {}
   void dispose() {}
