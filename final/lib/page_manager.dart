@@ -146,8 +146,29 @@ class PageManager {
     }
   }
 
-  // TODO
-  void add() {}
-  void remove() {}
-  void dispose() {}
+  Future<void> add() async {
+    final songRepository = getIt<PlaylistRepository>();
+    final song = await songRepository.fetchAnotherSong();
+    final mediaItem = MediaItem(
+      id: song['id'] ?? '',
+      album: song['album'] ?? '',
+      title: song['title'] ?? '',
+      extras: {'url': song['url']},
+    );
+    _audioHandler.addQueueItem(mediaItem);
+  }
+
+  void remove() {
+    final lastIndex = _audioHandler.queue.value.length - 1;
+    if (lastIndex < 0) return;
+    _audioHandler.removeQueueItemAt(lastIndex);
+  }
+
+  void dispose() {
+    _audioHandler.customAction('dispose', null);
+  }
+
+  void stop() {
+    _audioHandler.stop();
+  }
 }

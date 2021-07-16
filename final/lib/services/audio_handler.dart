@@ -12,7 +12,7 @@ Future<AudioHandler> initAudioService() async {
   );
 }
 
-class MyAudioHandler extends BaseAudioHandler with QueueHandler {
+class MyAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
   final _playlist = ConcatenatingAudioSource(children: []);
 
@@ -105,11 +105,32 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler {
     queue.add(newQueue);
   }
 
+  @override
+  Future<void> addQueueItem(MediaItem mediaItem) async {
+    // manage Just Audio
+    final audioSource = _createAudioSource(mediaItem);
+    _playlist.add(audioSource);
+
+    // notify system
+    final newQueue = queue.value..add(mediaItem);
+    queue.add(newQueue);
+  }
+
   UriAudioSource _createAudioSource(MediaItem mediaItem) {
     return AudioSource.uri(
       Uri.parse(mediaItem.extras!['url']),
       tag: mediaItem,
     );
+  }
+
+  @override
+  Future<void> removeQueueItemAt(int index) async {
+    // manage Just Audio
+    _playlist.removeAt(index);
+
+    // notify system
+    final newQueue = queue.value..removeAt(index);
+    queue.add(newQueue);
   }
 
   @override
@@ -168,5 +189,19 @@ class MyAudioHandler extends BaseAudioHandler with QueueHandler {
       _player.setShuffleModeEnabled(true);
       _player.shuffle();
     }
+  }
+
+  @override
+  Future customAction(String name, [Map<String, dynamic>? extras]) async {
+    if (name == 'dispose') {
+      await _player.dispose();
+      super.stop();
+    }
+  }
+
+  @override
+  Future<void> stop() async {
+    await _player.stop();
+    return super.stop();
   }
 }
