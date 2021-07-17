@@ -165,7 +165,7 @@ class PageManager {
   }
 
   void dispose() {
-    _audioHandler.customAction('dispose', null);
+    _audioHandler.customAction('dispose');
   }
 
   void stop() {
