@@ -46,9 +46,14 @@ class PageManager {
 
   void _listenToChangesInPlaylist() {
     _audioHandler.queue.listen((playlist) {
-      if (playlist.isEmpty) return;
-      final newList = playlist.map((item) => item.title).toList();
-      playlistNotifier.value = newList;
+      if (playlist.isEmpty) {
+        playlistNotifier.value = [];
+        currentSongTitleNotifier.value = '';
+      } else {
+        final newList = playlist.map((item) => item.title).toList();
+        playlistNotifier.value = newList;
+      }
+      _updateSkipButtons();
     });
   }
 
@@ -105,11 +110,21 @@ class PageManager {
 
   void _listenToChangesInSong() {
     _audioHandler.mediaItem.listen((mediaItem) {
-      final playlist = _audioHandler.queue.value;
+      currentSongTitleNotifier.value = mediaItem?.title ?? '';
+      _updateSkipButtons();
+    });
+  }
+
+  void _updateSkipButtons() {
+    final mediaItem = _audioHandler.mediaItem.value;
+    final playlist = _audioHandler.queue.value;
+    if (playlist.length < 2 || mediaItem == null) {
+      isFirstSongNotifier.value = true;
+      isLastSongNotifier.value = true;
+    } else {
       isFirstSongNotifier.value = playlist.first == mediaItem;
       isLastSongNotifier.value = playlist.last == mediaItem;
-      currentSongTitleNotifier.value = mediaItem?.title ?? '';
-    });
+    }
   }
 
   void play() => _audioHandler.play();

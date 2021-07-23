@@ -18,13 +18,14 @@ class MyAudioHandler extends BaseAudioHandler {
   final _playlist = ConcatenatingAudioSource(children: []);
 
   MyAudioHandler() {
-    _init();
-  }
-
-  Future<void> _init() async {
+    _loadEmptyPlaylist();
     _notifyAudioHandlerAboutPlaybackEvents();
     _listenForDurationChanges();
+    _listenForCurrentSongIndexChanges();
     _listenForSequenceStateChanges();
+  }
+
+  Future<void> _loadEmptyPlaylist() async {
     try {
       await _player.setAudioSource(_playlist);
     } catch (e) {
@@ -73,13 +74,21 @@ class MyAudioHandler extends BaseAudioHandler {
   void _listenForDurationChanges() {
     _player.durationStream.listen((duration) {
       final index = _player.currentIndex;
-      if (index == null) return;
       final newQueue = queue.value;
+      if (index == null || newQueue.isEmpty) return;
       final oldMediaItem = newQueue[index];
       final newMediaItem = oldMediaItem.copyWith(duration: duration);
       newQueue[index] = newMediaItem;
       queue.add(newQueue);
       mediaItem.add(newMediaItem);
+    });
+  }
+
+  void _listenForCurrentSongIndexChanges() {
+    _player.currentIndexStream.listen((index) {
+      final playlist = queue.value;
+      if (index == null || playlist.isEmpty) return;
+      mediaItem.add(playlist[index]);
     });
   }
 
