@@ -73,9 +73,12 @@ class MyAudioHandler extends BaseAudioHandler {
 
   void _listenForDurationChanges() {
     _player.durationStream.listen((duration) {
-      final index = _player.currentIndex;
+      var index = _player.currentIndex;
       final newQueue = queue.value;
       if (index == null || newQueue.isEmpty) return;
+      if (_player.shuffleModeEnabled) {
+        index = _player.shuffleIndices![index];
+      }
       final oldMediaItem = newQueue[index];
       final newMediaItem = oldMediaItem.copyWith(duration: duration);
       newQueue[index] = newMediaItem;
@@ -88,6 +91,9 @@ class MyAudioHandler extends BaseAudioHandler {
     _player.currentIndexStream.listen((index) {
       final playlist = queue.value;
       if (index == null || playlist.isEmpty) return;
+      if (_player.shuffleModeEnabled) {
+        index = _player.shuffleIndices![index];
+      }
       mediaItem.add(playlist[index]);
     });
   }
@@ -152,25 +158,17 @@ class MyAudioHandler extends BaseAudioHandler {
   @override
   Future<void> skipToQueueItem(int index) async {
     if (index < 0 || index >= queue.value.length) return;
+    if (_player.shuffleModeEnabled) {
+      index = _player.shuffleIndices![index];
+    }
     _player.seek(Duration.zero, index: index);
   }
 
   @override
-  Future<void> skipToNext() async {
-    await _skip(1);
-  }
+  Future<void> skipToNext() => _player.seekToNext();
 
   @override
-  Future<void> skipToPrevious() async {
-    await _skip(-1);
-  }
-
-  Future<void> _skip(int offset) async {
-    final queue = this.queue.value;
-    final index = playbackState.value.queueIndex ?? -1;
-    if (index < 0 || index >= queue.length) return;
-    return skipToQueueItem(index + offset);
-  }
+  Future<void> skipToPrevious() => _player.seekToPrevious();
 
   @override
   Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {
@@ -193,8 +191,8 @@ class MyAudioHandler extends BaseAudioHandler {
     if (shuffleMode == AudioServiceShuffleMode.none) {
       _player.setShuffleModeEnabled(false);
     } else {
+      await _player.shuffle();
       _player.setShuffleModeEnabled(true);
-      _player.shuffle();
     }
   }
 
