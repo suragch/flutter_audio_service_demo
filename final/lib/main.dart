@@ -8,12 +8,14 @@ import 'services/service_locator.dart';
 
 void main() async {
   await setupServiceLocator();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
-  _MyAppState createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -36,7 +38,7 @@ class _MyAppState extends State<MyApp> {
         body: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
-            children: [
+            children: const [
               CurrentSongTitle(),
               Playlist(),
               AddRemoveSongButtons(),
@@ -60,7 +62,7 @@ class CurrentSongTitle extends StatelessWidget {
       builder: (_, title, __) {
         return Padding(
           padding: const EdgeInsets.only(top: 8.0),
-          child: Text(title, style: TextStyle(fontSize: 40)),
+          child: Text(title, style: const TextStyle(fontSize: 40)),
         );
       },
     );
@@ -80,7 +82,7 @@ class Playlist extends StatelessWidget {
             itemCount: playlistTitles.length,
             itemBuilder: (context, index) {
               return ListTile(
-                title: Text('${playlistTitles[index]}'),
+                title: Text(playlistTitles[index]),
               );
             },
           );
@@ -102,11 +104,11 @@ class AddRemoveSongButtons extends StatelessWidget {
         children: [
           FloatingActionButton(
             onPressed: pageManager.add,
-            child: Icon(Icons.add),
+            child: const Icon(Icons.add),
           ),
           FloatingActionButton(
             onPressed: pageManager.remove,
-            child: Icon(Icons.remove),
+            child: const Icon(Icons.remove),
           ),
         ],
       ),
@@ -137,11 +139,11 @@ class AudioControlButtons extends StatelessWidget {
   const AudioControlButtons({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 60,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
+        children: const [
           RepeatButton(),
           PreviousSongButton(),
           PlayButton(),
@@ -164,13 +166,13 @@ class RepeatButton extends StatelessWidget {
         Icon icon;
         switch (value) {
           case RepeatState.off:
-            icon = Icon(Icons.repeat, color: Colors.grey);
+            icon = const Icon(Icons.repeat, color: Colors.grey);
             break;
           case RepeatState.repeatSong:
-            icon = Icon(Icons.repeat_one);
+            icon = const Icon(Icons.repeat_one);
             break;
           case RepeatState.repeatPlaylist:
-            icon = Icon(Icons.repeat);
+            icon = const Icon(Icons.repeat);
             break;
         }
         return IconButton(
@@ -191,7 +193,7 @@ class PreviousSongButton extends StatelessWidget {
       valueListenable: pageManager.isFirstSongNotifier,
       builder: (_, isFirst, __) {
         return IconButton(
-          icon: Icon(Icons.skip_previous),
+          icon: const Icon(Icons.skip_previous),
           onPressed: (isFirst) ? null : pageManager.previous,
         );
       },
@@ -210,20 +212,20 @@ class PlayButton extends StatelessWidget {
         switch (value) {
           case ButtonState.loading:
             return Container(
-              margin: EdgeInsets.all(8.0),
+              margin: const EdgeInsets.all(8.0),
               width: 32.0,
               height: 32.0,
-              child: CircularProgressIndicator(),
+              child: const CircularProgressIndicator(),
             );
           case ButtonState.paused:
             return IconButton(
-              icon: Icon(Icons.play_arrow),
+              icon: const Icon(Icons.play_arrow),
               iconSize: 32.0,
               onPressed: pageManager.play,
             );
           case ButtonState.playing:
             return IconButton(
-              icon: Icon(Icons.pause),
+              icon: const Icon(Icons.pause),
               iconSize: 32.0,
               onPressed: pageManager.pause,
             );
@@ -242,7 +244,7 @@ class NextSongButton extends StatelessWidget {
       valueListenable: pageManager.isLastSongNotifier,
       builder: (_, isLast, __) {
         return IconButton(
-          icon: Icon(Icons.skip_next),
+          icon: const Icon(Icons.skip_next),
           onPressed: (isLast) ? null : pageManager.next,
         );
       },
@@ -260,8 +262,8 @@ class ShuffleButton extends StatelessWidget {
       builder: (context, isEnabled, child) {
         return IconButton(
           icon: (isEnabled)
-              ? Icon(Icons.shuffle)
-              : Icon(Icons.shuffle, color: Colors.grey),
+              ? const Icon(Icons.shuffle)
+              : const Icon(Icons.shuffle, color: Colors.grey),
           onPressed: pageManager.shuffle,
         );
       },
