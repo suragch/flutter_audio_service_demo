@@ -5,16 +5,16 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.19.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  audio_video_progress_bar: ^0.5.0
-  get_it: ^7.1.2
+  audio_video_progress_bar: ^1.0.0
+  get_it: ^7.2.0
 
 dev_dependencies:
-  flutter_lints: ^1.0.3
+  flutter_lints: any
   flutter_test:
     sdk: flutter
 
