@@ -77,7 +77,7 @@ class MyAudioHandler extends BaseAudioHandler {
       final newQueue = queue.value;
       if (index == null || newQueue.isEmpty) return;
       if (_player.shuffleModeEnabled) {
-        index = _player.shuffleIndices![index];
+        index = _player.shuffleIndices!.indexOf(index);
       }
       final oldMediaItem = newQueue[index];
       final newMediaItem = oldMediaItem.copyWith(duration: duration);
@@ -92,7 +92,7 @@ class MyAudioHandler extends BaseAudioHandler {
       final playlist = queue.value;
       if (index == null || playlist.isEmpty) return;
       if (_player.shuffleModeEnabled) {
-        index = _player.shuffleIndices![index];
+        index = _player.shuffleIndices!.indexOf(index);
       }
       mediaItem.add(playlist[index]);
     });
