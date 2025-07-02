@@ -6,3 +6,6 @@ analyzer:
     strict-raw-types: true
   strong-mode:
     implicit-casts: false
+
+formatter:
+  page_width: 80

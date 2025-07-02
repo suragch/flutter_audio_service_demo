@@ -1,19 +1,13 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="dev.suragch.flutter_audio_service_demo">
-
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.INTERNET" /> 
-
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
         android:label="flutter_audio_service_demo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
-            android:name="com.ryanheise.audioservice.AudioServiceActivity"
+            android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
+            android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
@@ -36,24 +30,16 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-
-        <service 
-            android:name="com.ryanheise.audioservice.AudioService"
-            android:foregroundServiceType="mediaPlayback"
-            android:exported="true" 
-            tools:ignore="Instantiatable">
-          <intent-filter>
-            <action android:name="android.media.browse.MediaBrowserService" />
-          </intent-filter>
-        </service>
-
-        <receiver 
-            android:name="com.ryanheise.audioservice.MediaButtonReceiver"
-            android:exported="true" 
-            tools:ignore="Instantiatable">
-          <intent-filter>
-            <action android:name="android.intent.action.MEDIA_BUTTON" />
-          </intent-filter>
-        </receiver> 
     </application>
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
+         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+    </queries>
 </manifest>
